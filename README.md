@@ -14,11 +14,14 @@ Solução Fullstack para automação de contabilidade de IVA (Portugal/Espanha).
 
 ## 📸 Demonstração do Sistema
 
-### 📊 Dashboard Web (Localhost)
+### 📊 Dashboard Web (Localhost)![neon-db](https://github.com/user-attachments/assets/caab409d-cc96-492b-87e2-f870ee6f3439)
+
 ![Dashboard](./screenshots/neon-db.jpeg)
 
 ### 🗄️ Banco de Dados (Neon Postgres)
-![Tabela no Neon](./screenshots/neon-db1.jpeg)
+![Tabela no Neon](./screenshots/neon-db1.jpeg)![neon-db1](https://github.com/user-attachments/assets/203e1d7b-920f-446b-a6fc-8f28935b1706)
+
 
 ### 🤖 Registro de Despesas no Telegram
-![Telegram Bot](./screenshots/neon-db2.jpeg)
+![Telegram Bot](./screenshots/neon-db2.jpeg)![neon-db2](https://github.com/user-attachments/assets/3c7d053e-d36e-4c81-bb62-b42aab000a43)
+
