@@ -1,0 +1,69 @@
+const { Telegraf } = require('telegraf');
+require('dotenv').config();
+
+const bot = new Telegraf(process.env.TELEGRAM_TOKEN);
+
+/**
+ * Lógica de Negócio: Fluxo Inteligente de IVA/VAT
+ * Regra: Em Portugal (23%) ou Espanha (21%), o IVA já está no preço.
+ * Fórmula para extrair: Valor Bruto / (1 + Taxa)
+ */
+function calcularContabilidade(texto) {
+    const regexValor = /(\d+(?:[.,]\d+)?)/;
+    const match = texto.match(regexValor);
+    
+    if (!match) return null;
+
+    const valorBruto = parseFloat(match[0].replace(',', '.'));
+    const taxaIVA = 0.23; // Exemplo: IVA padrão de Portugal (23%)
+    
+    // Cálculo Contábil Real
+    const valorBase = valorBruto / (1 + taxaIVA);
+    const valorIVA = valorBruto - valorBase;
+
+    // Identificação de Categoria por Keywords
+    let categoria = "Geral/Suprimentos";
+    const t = texto.toLowerCase();
+    if (t.includes("almoço") || t.includes("jantar") || t.includes("cafe")) categoria = "Restauração";
+    if (t.includes("uber") || t.includes("taxi") || t.includes("gasolina")) categoria = "Logística/Transporte";
+
+    return {
+        data: new Date().toLocaleDateString('pt-PT'),
+        descricao: texto,
+        bruto: valorBruto.toFixed(2),
+        base: valorBase.toFixed(2),
+        iva: valorIVA.toFixed(2),
+        categoria: categoria,
+        moeda: "EUR"
+    };
+}
+
+// Comandos do Bot
+bot.start((ctx) => {
+    ctx.reply('🏦 EuroTax Automator v1.0\nEnvie a despesa (ex: "Almoço 25.50")');
+});
+
+bot.on('text', async (ctx) => {
+    const dados = calcularContabilidade(ctx.message.text);
+
+    if (dados) {
+        console.log("📊 Processando para Contabilidade:", dados);
+
+        const resposta = `✅ **Despesa Processada (Padrão UE)**\n\n` +
+                         `📂 Categoria: ${dados.categoria}\n` +
+                         `💰 Valor Total: ${dados.bruto} ${dados.moeda}\n` +
+                         `📉 Base Tributável: ${dados.base} ${dados.moeda}\n` +
+                         `🏛️ IVA (23%): ${dados.iva} ${dados.moeda}\n\n` +
+                         `*Pronto para sincronizar com Google Sheets.*`;
+        
+        await ctx.replyWithMarkdown(resposta);
+    } else {
+        await ctx.reply("❌ Formato inválido. Envie algo como: 'Uber 15.00'");
+    }
+});
+
+bot.launch();
+
+// Graceful stop
+process.once('SIGINT', () => bot.stop('SIGINT'));
+process.once('SIGTERM', () => bot.stop('SIGTERM'));
